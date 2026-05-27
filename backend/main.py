@@ -109,7 +109,9 @@ def test_email():
         return {"status": "error", "detail": "Thiếu env vars EMAIL_FROM / EMAIL_PASSWORD / EMAIL_TO"}
 
     try:
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        with smtplib.SMTP("smtp.gmail.com", 587, timeout=15) as server:
+            server.ehlo()
+            server.starttls()
             server.login(EMAIL_FROM, EMAIL_PASSWORD)
             server.sendmail(EMAIL_FROM, EMAIL_TO, f"Subject: Test email Dinh Thin\n\nEmail hoat dong!")
         return {"status": "ok", "sent_to": EMAIL_TO}
