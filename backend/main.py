@@ -22,6 +22,21 @@ from email_utils import send_order_notification, send_contact_notification
 # ── Tạo bảng nếu chưa có ──
 Base.metadata.create_all(bind=engine)
 
+# ── Tạo admin mặc định nếu chưa có ──
+def _seed_admin():
+    import bcrypt
+    from sqlalchemy.orm import Session
+    with Session(engine) as db:
+        if not db.query(models.Admin).first():
+            username = os.getenv("ADMIN_USERNAME", "admin")
+            password = os.getenv("ADMIN_PASSWORD", "admin123")
+            hashed  = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+            db.add(models.Admin(username=username, hashed_password=hashed))
+            db.commit()
+            print(f"[init] Đã tạo admin mặc định: {username}")
+
+_seed_admin()
+
 # ── Rate Limiter ──
 limiter = Limiter(key_func=get_remote_address)
 
