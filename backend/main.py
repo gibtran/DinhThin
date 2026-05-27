@@ -228,7 +228,7 @@ def create_order(
     for item in data.items:
         db.add(models.OrderItem(
             order_id=order.id,
-            product_id=item.product_id,
+            product_id=None,          # không ràng buộc FK — tránh lỗi nếu product bị xóa
             product_name=item.product_name,
             quantity=item.quantity,
             unit_price=item.unit_price,
