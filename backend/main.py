@@ -99,22 +99,21 @@ if os.path.isdir(IMG_DIR):
 
 @app.get("/api/debug/email", tags=["Debug"])
 def test_email():
-    """Gửi email test để kiểm tra cấu hình."""
-    import smtplib
-    EMAIL_FROM     = os.getenv("EMAIL_FROM")
-    EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-    EMAIL_TO       = os.getenv("EMAIL_TO")
-
-    if not all([EMAIL_FROM, EMAIL_PASSWORD, EMAIL_TO]):
-        return {"status": "error", "detail": "Thiếu env vars EMAIL_FROM / EMAIL_PASSWORD / EMAIL_TO"}
-
+    """Gửi email test để kiểm tra cấu hình Resend."""
+    import resend as _resend
+    api_key  = os.getenv("RESEND_API_KEY", "")
+    email_to = os.getenv("EMAIL_TO", "")
+    if not api_key or not email_to:
+        return {"status": "error", "detail": "Thiếu RESEND_API_KEY hoặc EMAIL_TO"}
     try:
-        with smtplib.SMTP("smtp.gmail.com", 587, timeout=15) as server:
-            server.ehlo()
-            server.starttls()
-            server.login(EMAIL_FROM, EMAIL_PASSWORD)
-            server.sendmail(EMAIL_FROM, EMAIL_TO, f"Subject: Test email Dinh Thin\n\nEmail hoat dong!")
-        return {"status": "ok", "sent_to": EMAIL_TO}
+        _resend.api_key = api_key
+        r = _resend.Emails.send({
+            "from":    "Đình Thìn <onboarding@resend.dev>",
+            "to":      [email_to],
+            "subject": "Test email Đình Thìn",
+            "html":    "<p>✅ Email từ Resend đang hoạt động!</p>",
+        })
+        return {"status": "ok", "sent_to": email_to, "id": str(r)}
     except Exception as e:
         return {"status": "error", "detail": str(e)}
 
