@@ -65,6 +65,30 @@ if os.path.isdir(IMG_DIR):
 
 
 # ════════════════════════════════════════════════════
+#  DEBUG – test email (xóa sau khi debug xong)
+# ════════════════════════════════════════════════════
+
+@app.get("/api/debug/email", tags=["Debug"])
+def test_email():
+    """Gửi email test để kiểm tra cấu hình."""
+    import smtplib
+    EMAIL_FROM     = os.getenv("EMAIL_FROM")
+    EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+    EMAIL_TO       = os.getenv("EMAIL_TO")
+
+    if not all([EMAIL_FROM, EMAIL_PASSWORD, EMAIL_TO]):
+        return {"status": "error", "detail": "Thiếu env vars EMAIL_FROM / EMAIL_PASSWORD / EMAIL_TO"}
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(EMAIL_FROM, EMAIL_PASSWORD)
+            server.sendmail(EMAIL_FROM, EMAIL_TO, f"Subject: Test email Dinh Thin\n\nEmail hoat dong!")
+        return {"status": "ok", "sent_to": EMAIL_TO}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
+
+
+# ════════════════════════════════════════════════════
 #  CONTACT
 # ════════════════════════════════════════════════════
 
