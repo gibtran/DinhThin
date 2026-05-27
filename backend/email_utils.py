@@ -114,7 +114,7 @@ def send_order_notification(order) -> None:
           </table>
 
           <div style="margin-top:24px;text-align:center">
-            <a href="http://localhost:3000/admin.html"
+            <a href="https://dinhthin.netlify.app/admin.html"
                style="background:#8B1A1A;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:bold">
               Xem trong trang Admin
             </a>
