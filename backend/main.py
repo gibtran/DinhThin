@@ -306,7 +306,8 @@ def dashboard(
     total_orders   = db.query(models.Order).count()
     pending_orders = db.query(models.Order).filter(models.Order.status == "pending").count()
     revenue_row    = db.query(func.sum(models.Order.total)).filter(
-        models.Order.status.in_(["confirmed", "shipping", "completed"])
+        models.Order.status == "completed",
+        models.Order.payment_status == "paid",
     ).scalar()
     total_products = db.query(models.Product).filter(models.Product.is_active == True).count()
 
