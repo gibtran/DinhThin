@@ -237,8 +237,25 @@ def create_order(
     db.commit()
     db.refresh(order)
 
-    # Gửi email thông báo cho admin (chạy nền, không làm chậm response)
-    background_tasks.add_task(send_order_notification, order)
+    # Truyền data thô vào background task — tránh SQLAlchemy session bị đóng
+    order_data = {
+        "id":               order.id,
+        "customer_name":    order.customer_name,
+        "customer_phone":   order.customer_phone,
+        "customer_address": order.customer_address,
+        "notes":            order.notes or "",
+        "total":            order.total,
+        "payment_method":   order.payment_method,
+        "items": [
+            {
+                "product_name": item.product_name,
+                "quantity":     item.quantity,
+                "unit_price":   item.unit_price,
+            }
+            for item in order.items   # đọc trong khi session còn mở
+        ],
+    }
+    background_tasks.add_task(send_order_notification, order_data)
 
     return order
 
