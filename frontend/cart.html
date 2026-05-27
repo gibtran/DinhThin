@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giỏ Hàng – Đình Thìn</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="./config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #8B1A1A; --red-dark: #5C0E0E;
+      --gold: #C9A84C; --gold-lt: #E8D49A;
+      --cream: #FFF8F0; --cream2: #F5ECD8;
+      --brown: #2D1B00; --text: #3D2B10; --muted: #7A6050;
+      --white: #FFFFFF; --border: #E8DDD0;
+      --green: #2E7D32; --green-lt: #E8F5E9;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+    button { cursor: pointer; font-family: inherit; }
+    input, select, textarea { font-family: inherit; }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--red); padding: 0 40px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 16px rgba(0,0,0,.25); position: sticky; top: 0; z-index: 100;
+    }
+    .header-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo-mark {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--gold); display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--red-dark);
+    }
+    .logo-name { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: #fff; }
+    .back-btn {
+      color: #ffffffcc; font-size: 14px; text-decoration: none;
+      display: flex; align-items: center; gap: 6px; transition: color .2s;
+    }
+    .back-btn:hover { color: var(--gold-lt); }
+
+    /* ── STEPS ── */
+    .steps-bar {
+      background: #fff; border-bottom: 1px solid var(--border);
+      padding: 18px 40px; display: flex; align-items: center; justify-content: center; gap: 0;
+    }
+    .step { display: flex; align-items: center; gap: 8px; }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; transition: all .3s;
+    }
+    .step-num.active { background: var(--red); color: #fff; }
+    .step-num.done   { background: var(--green); color: #fff; }
+    .step-num.idle   { background: var(--border); color: var(--muted); }
+    .step-label { font-size: 13px; font-weight: 500; transition: color .3s; }
+    .step-label.active { color: var(--red); font-weight: 600; }
+    .step-label.done   { color: var(--green); }
+    .step-label.idle   { color: var(--muted); }
+    .step-divider { width: 48px; height: 2px; background: var(--border); margin: 0 8px; border-radius: 2px; }
+    .step-divider.done { background: var(--green); }
+
+    /* ── LAYOUT ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 40px 24px; display: grid; grid-template-columns: 1fr 360px; gap: 28px; align-items: start; }
+    .page.full { grid-template-columns: 1fr; max-width: 640px; }
+    @media (max-width: 860px) { .page { grid-template-columns: 1fr; } .steps-bar { padding: 16px 20px; } .header { padding: 0 20px; } }
+
+    /* ── CARD ── */
+    .card { background: #fff; border-radius: 16px; padding: 28px; box-shadow: 0 2px 16px rgba(45,27,0,.07); }
+    .card-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--red); margin-bottom: 24px; }
+
+    /* ── CART ITEMS ── */
+    .cart-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); align-items: center; }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-img { width: 80px; height: 80px; object-fit: cover; border-radius: 10px; flex-shrink: 0; background: var(--cream2); }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+    .cart-item-price-unit { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+    .qty-row { display: flex; align-items: center; gap: 10px; }
+    .qty-btn { width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid var(--border); background: #fff; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+    .qty-btn:hover { border-color: var(--gold); background: var(--cream); }
+    .qty-num { font-size: 15px; font-weight: 600; min-width: 24px; text-align: center; }
+    .item-subtotal { font-size: 15px; font-weight: 700; color: var(--red); white-space: nowrap; }
+    .remove-btn { background: none; border: none; color: #ccc; font-size: 18px; padding: 4px 8px; transition: color .15s; flex-shrink: 0; }
+    .remove-btn:hover { color: #e53935; }
+
+    .cart-empty-state { text-align: center; padding: 60px 0; }
+    .cart-empty-icon { font-size: 56px; margin-bottom: 16px; opacity: .5; }
+    .cart-empty-text { color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+    .continue-btn {
+      display: inline-block; padding: 12px 28px; background: var(--red); color: #fff;
+      border-radius: 28px; font-size: 14px; font-weight: 600; text-decoration: none; border: none; transition: background .2s;
+    }
+    .continue-btn:hover { background: var(--red-dark); }
+
+    /* ── ORDER SUMMARY ── */
+    .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; }
+    .summary-row.total { font-size: 18px; font-weight: 700; color: var(--red); padding-top: 12px; margin-top: 4px; border-top: 2px solid var(--border); }
+    .summary-row span:first-child { color: var(--muted); }
+    .summary-row.total span { color: var(--red); }
+    .proceed-btn {
+      width: 100%; padding: 15px; background: var(--red); color: #fff;
+      border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+      margin-top: 20px; transition: background .2s;
+    }
+    .proceed-btn:hover { background: var(--red-dark); }
+    .proceed-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* ── FORM ── */
+    .form-group { margin-bottom: 18px; }
+    .form-label { font-size: 13px; font-weight: 600; color: var(--text); display: block; margin-bottom: 6px; }
+    .form-input {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 14px; outline: none; transition: border .2s; background: #fff;
+    }
+    .form-input:focus { border-color: var(--gold); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* ── PAYMENT METHOD ── */
+    .pay-options { display: flex; gap: 10px; margin-top: 4px; }
+    .pay-option {
+      flex: 1; border: 2px solid var(--border); border-radius: 12px;
+      padding: 12px 14px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+      font-size: 14px; transition: all .2s; background: #fff;
+    }
+    .pay-option.selected { border-color: var(--gold); background: #fff8f0; font-weight: 600; }
+    .bank-info {
+      background: #fff8f0; border: 1px solid var(--gold-lt); border-radius: 12px;
+      padding: 14px 16px; margin-top: 12px; font-size: 13px; line-height: 1.9;
+    }
+    .bank-info strong { color: var(--red); }
+
+    /* ── CONFIRM BTN ── */
+    .confirm-btn {
+      width: 100%; padding: 15px; background: var(--red); color: #fff;
+      border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+      margin-top: 8px; transition: background .2s;
+    }
+    .confirm-btn:hover:not(:disabled) { background: var(--red-dark); }
+    .confirm-btn:disabled { opacity: .55; cursor: not-allowed; }
+    .err-msg { color: #e53935; font-size: 13px; margin-bottom: 12px; }
+
+    /* ── SUCCESS ── */
+    .success-wrap { text-align: center; padding: 40px 20px; }
+    .success-icon { font-size: 72px; margin-bottom: 20px; animation: pop .4s ease; }
+    @keyframes pop { 0%{transform:scale(.5);opacity:0} 70%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+    .success-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--red); margin-bottom: 8px; }
+    .success-sub { color: var(--muted); font-size: 15px; margin-bottom: 6px; }
+    .success-order-id { color: var(--gold); font-size: 18px; font-weight: 700; margin-bottom: 24px; }
+    .success-detail { background: #fff; border-radius: 14px; padding: 20px; text-align: left; margin-bottom: 28px; border: 1px solid var(--border); }
+    .success-detail-row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .success-detail-row:last-child { border-bottom: none; }
+    .success-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-gold { padding: 13px 28px; background: var(--gold); color: var(--red-dark); border: none; border-radius: 28px; font-size: 14px; font-weight: 700; transition: background .2s; }
+    .btn-gold:hover { background: var(--gold-lt); }
+    .btn-outline-red { padding: 13px 28px; background: transparent; color: var(--red); border: 2px solid var(--red); border-radius: 28px; font-size: 14px; font-weight: 600; text-decoration: none; transition: all .2s; }
+    .btn-outline-red:hover { background: var(--red); color: #fff; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+const API_URL = API_BASE;
+const fmt = n => new Intl.NumberFormat("vi-VN").format(n) + "đ";
+
+function App() {
+  const [cart, setCart]           = useState([]);
+  const [step, setStep]           = useState(1); // 1=cart, 2=checkout, 3=success
+  const [order, setOrder]         = useState(null);
+
+  // Load cart từ localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("dt_cart");
+      if (saved) setCart(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  // Sync cart -> localStorage
+  useEffect(() => {
+    localStorage.setItem("dt_cart", JSON.stringify(cart));
+  }, [cart]);
+
+  const total    = cart.reduce((s, i) => s + i.price * i.qty, 0);
+  const count    = cart.reduce((s, i) => s + i.qty, 0);
+
+  const changeQty = (id, delta) =>
+    setCart(prev => prev.map(i => i.id === id ? {...i, qty: Math.max(1, i.qty + delta)} : i));
+
+  const removeItem = id => setCart(prev => prev.filter(i => i.id !== id));
+
+  const onOrderSuccess = (orderData) => {
+    setOrder(orderData);
+    setCart([]);
+    localStorage.removeItem("dt_cart");
+    setStep(3);
+  };
+
+  const stepState = (n) => {
+    if (n < step) return "done";
+    if (n === step) return "active";
+    return "idle";
+  };
+
+  return (
+    <div>
+      {/* Header */}
+      <header className="header">
+        <a href="index.html" className="header-logo">
+          <div className="logo-mark">Đ</div>
+          <span className="logo-name">Đình Thìn</span>
+        </a>
+        <a href="index.html" className="back-btn">← Tiếp tục mua sắm</a>
+      </header>
+
+      {/* Steps */}
+      {step < 3 && (
+        <div className="steps-bar">
+          <div className="step">
+            <div className={`step-num ${stepState(1)}`}>{step > 1 ? "✓" : "1"}</div>
+            <span className={`step-label ${stepState(1)}`}>Giỏ hàng</span>
+          </div>
+          <div className={`step-divider ${step > 1 ? "done" : ""}`} />
+          <div className="step">
+            <div className={`step-num ${stepState(2)}`}>{step > 2 ? "✓" : "2"}</div>
+            <span className={`step-label ${stepState(2)}`}>Thông tin đặt hàng</span>
+          </div>
+          <div className="step-divider" />
+          <div className="step">
+            <div className={`step-num ${stepState(3)}`}>3</div>
+            <span className={`step-label ${stepState(3)}`}>Xác nhận</span>
+          </div>
+        </div>
+      )}
+
+      {/* Step 1: Cart */}
+      {step === 1 && (
+        <div className="page">
+          <div className="card">
+            <h2 className="card-title">🛒 Giỏ hàng ({count} sản phẩm)</h2>
+
+            {cart.length === 0 ? (
+              <div className="cart-empty-state">
+                <div className="cart-empty-icon">🎑</div>
+                <p className="cart-empty-text">Giỏ hàng của bạn đang trống</p>
+                <a href="index.html" className="continue-btn">Khám phá sản phẩm</a>
+              </div>
+            ) : (
+              cart.map(item => (
+                <div className="cart-item" key={item.id}>
+                  <img src={item.img || "./img/IMG_2213.JPG"} alt={item.name} className="cart-item-img"
+                    onError={e => e.target.src = "./img/IMG_2213.JPG"} />
+                  <div className="cart-item-info">
+                    <p className="cart-item-name">{item.name}</p>
+                    <p className="cart-item-price-unit">{fmt(item.price)} / cái</p>
+                    <div className="qty-row">
+                      <button className="qty-btn" onClick={() => changeQty(item.id, -1)}>−</button>
+                      <span className="qty-num">{item.qty}</span>
+                      <button className="qty-btn" onClick={() => changeQty(item.id, +1)}>+</button>
+                    </div>
+                  </div>
+                  <span className="item-subtotal">{fmt(item.price * item.qty)}</span>
+                  <button className="remove-btn" onClick={() => removeItem(item.id)} title="Xoá">✕</button>
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Order summary */}
+          {cart.length > 0 && (
+            <div>
+              <div className="card">
+                <h2 className="card-title">Tóm tắt đơn hàng</h2>
+                {cart.map(i => (
+                  <div className="summary-row" key={i.id}>
+                    <span>{i.name} × {i.qty}</span>
+                    <span style={{color:"var(--text)",fontWeight:500}}>{fmt(i.price * i.qty)}</span>
+                  </div>
+                ))}
+                <div className="summary-row" style={{marginTop:8}}>
+                  <span>Phí giao hàng</span>
+                  <span style={{color:"var(--green)",fontWeight:600}}>Miễn phí</span>
+                </div>
+                <div className="summary-row total">
+                  <span>Tổng cộng</span>
+                  <span>{fmt(total)}</span>
+                </div>
+                <button className="proceed-btn" onClick={() => setStep(2)}>
+                  Tiến hành đặt hàng →
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Step 2: Checkout form */}
+      {step === 2 && (
+        <CheckoutForm
+          cart={cart}
+          total={total}
+          count={count}
+          onBack={() => setStep(1)}
+          onSuccess={onOrderSuccess}
+        />
+      )}
+
+      {/* Step 3: Success */}
+      {step === 3 && order && (
+        <div className="page full">
+          <div className="card">
+            <div className="success-wrap">
+              <div className="success-icon">🎉</div>
+              <h2 className="success-title">Đặt hàng thành công!</h2>
+              <p className="success-sub">Cảm ơn bạn đã tin tưởng Đình Thìn</p>
+              <p className="success-order-id">Mã đơn hàng: #{order.id}</p>
+
+              <div className="success-detail">
+                <div className="success-detail-row">
+                  <span style={{color:"var(--muted)"}}>Khách hàng</span>
+                  <strong>{order.customer_name}</strong>
+                </div>
+                <div className="success-detail-row">
+                  <span style={{color:"var(--muted)"}}>Số điện thoại</span>
+                  <span>{order.customer_phone}</span>
+                </div>
+                <div className="success-detail-row">
+                  <span style={{color:"var(--muted)"}}>Địa chỉ</span>
+                  <span style={{textAlign:"right",maxWidth:"60%"}}>{order.customer_address}</span>
+                </div>
+                <div className="success-detail-row">
+                  <span style={{color:"var(--muted)"}}>Thanh toán</span>
+                  <span>{order.payment_method === "bank_transfer" ? "🏦 Chuyển khoản" : "💵 Tiền mặt (COD)"}</span>
+                </div>
+                <div className="success-detail-row">
+                  <span style={{color:"var(--muted)"}}>Tổng tiền</span>
+                  <strong style={{color:"var(--red)",fontSize:16}}>{fmt(order.total)}</strong>
+                </div>
+              </div>
+
+              {order.payment_method === "bank_transfer" && (
+                <div className="bank-info" style={{marginBottom:24,textAlign:"left"}}>
+                  <p style={{fontWeight:700,color:"var(--red)",marginBottom:8}}>📋 Thông tin chuyển khoản</p>
+                  <p>🏦 Ngân hàng: <strong>Vietcombank</strong></p>
+                  <p>💳 Số TK: <strong>1234567890</strong></p>
+                  <p>👤 Chủ TK: <strong>DINH THIN</strong></p>
+                  <p style={{marginTop:6}}>Nội dung: <strong>DT{order.customer_phone}</strong></p>
+                </div>
+              )}
+
+              <p style={{fontSize:13,color:"var(--muted)",marginBottom:24}}>
+                Chúng tôi sẽ liên hệ xác nhận đơn trong thời gian sớm nhất.
+              </p>
+
+              <div className="success-btns">
+                <button className="btn-gold" onClick={() => window.location.href = "index.html"}>
+                  Tiếp tục mua sắm
+                </button>
+                <a href={`index.html#lookup`} className="btn-outline-red"
+                  onClick={() => { window.location.href = "index.html"; }}>
+                  Tra cứu đơn hàng
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── CHECKOUT FORM COMPONENT ── */
+function CheckoutForm({ cart, total, count, onBack, onSuccess }) {
+  const [name,          setName]          = useState("");
+  const [phone,         setPhone]         = useState("");
+  const [address,       setAddress]       = useState("");
+  const [notes,         setNotes]         = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [loading,       setLoading]       = useState(false);
+  const [err,           setErr]           = useState("");
+
+  const submit = async () => {
+    if (!name.trim() || !phone.trim() || !address.trim()) {
+      setErr("Vui lòng điền đầy đủ họ tên, số điện thoại và địa chỉ giao hàng."); return;
+    }
+    setErr(""); setLoading(true);
+    try {
+      const r = await fetch(`${API_URL}/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer_name:    name.trim(),
+          customer_phone:   phone.trim(),
+          customer_address: address.trim(),
+          notes:            notes.trim() || null,
+          payment_method:   paymentMethod,
+          items: cart.map(i => ({
+            product_id:   i.id,
+            product_name: i.name,
+            quantity:     i.qty,
+            unit_price:   i.price,
+          })),
+        }),
+      });
+      if (!r.ok) throw new Error("Đặt hàng thất bại, vui lòng thử lại.");
+      const data = await r.json();
+      onSuccess(data);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="page">
+      {/* Left: Form */}
+      <div>
+        <div className="card" style={{marginBottom:20}}>
+          <h2 className="card-title">📋 Thông tin giao hàng</h2>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="form-label">Họ và tên *</label>
+              <input className="form-input" placeholder="Nguyễn Văn A" value={name} onChange={e => setName(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Số điện thoại *</label>
+              <input className="form-input" placeholder="0912 345 678" value={phone} onChange={e => setPhone(e.target.value)} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label className="form-label">Địa chỉ giao hàng *</label>
+            <input className="form-input" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành" value={address} onChange={e => setAddress(e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Ghi chú (tuỳ chọn)</label>
+            <input className="form-input" placeholder="VD: Gọi trước khi giao, giao giờ hành chính..." value={notes} onChange={e => setNotes(e.target.value)} />
+          </div>
+        </div>
+
+        <div className="card">
+          <h2 className="card-title">💳 Hình thức thanh toán</h2>
+          <div className="pay-options">
+            <label className={`pay-option${paymentMethod === "cod" ? " selected" : ""}`}
+              onClick={() => setPaymentMethod("cod")}>
+              <input type="radio" name="pm" checked={paymentMethod === "cod"} onChange={() => {}} style={{accentColor:"var(--gold)"}} />
+              💵 Tiền mặt (COD)
+            </label>
+            <label className={`pay-option${paymentMethod === "bank_transfer" ? " selected" : ""}`}
+              onClick={() => setPaymentMethod("bank_transfer")}>
+              <input type="radio" name="pm" checked={paymentMethod === "bank_transfer"} onChange={() => {}} style={{accentColor:"var(--gold)"}} />
+              🏦 Chuyển khoản
+            </label>
+          </div>
+
+          {paymentMethod === "bank_transfer" && (
+            <div className="bank-info">
+              <p style={{fontWeight:700,color:"var(--red)",marginBottom:6}}>📋 Thông tin chuyển khoản</p>
+              <p>🏦 Ngân hàng: <strong>Vietcombank</strong></p>
+              <p>💳 Số tài khoản: <strong>1234567890</strong></p>
+              <p>👤 Chủ tài khoản: <strong>DINH THIN</strong></p>
+              <p style={{marginTop:6}}>Nội dung CK: <strong>DT + số điện thoại</strong> (VD: DT0912345678)</p>
+              <p style={{marginTop:6,fontSize:12,color:"#e65100"}}>⚠️ Đơn sẽ được xác nhận sau khi admin kiểm tra thanh toán.</p>
+            </div>
+          )}
+        </div>
+
+        <button className="back-btn" style={{marginTop:20,color:"var(--muted)",fontSize:13}}
+          onClick={onBack}>← Quay lại giỏ hàng</button>
+      </div>
+
+      {/* Right: Summary */}
+      <div>
+        <div className="card" style={{position:"sticky",top:80}}>
+          <h2 className="card-title">Tóm tắt đơn hàng</h2>
+          {cart.map(i => (
+            <div className="summary-row" key={i.id}>
+              <span style={{maxWidth:180,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{i.name} × {i.qty}</span>
+              <span style={{color:"var(--text)",fontWeight:500,flexShrink:0}}>{fmt(i.price * i.qty)}</span>
+            </div>
+          ))}
+          <div className="summary-row" style={{marginTop:8}}>
+            <span>Phí giao hàng</span>
+            <span style={{color:"var(--green)",fontWeight:600}}>Miễn phí</span>
+          </div>
+          <div className="summary-row total">
+            <span>Tổng cộng</span>
+            <span>{fmt(total)}</span>
+          </div>
+          {err && <p className="err-msg" style={{marginTop:12}}>{err}</p>}
+          <button className="confirm-btn" onClick={submit} disabled={loading}>
+            {loading ? "⏳ Đang xử lý..." : `🛒 Xác nhận đặt hàng · ${fmt(total)}`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
+</script>
+</body>
+</html>

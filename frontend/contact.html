@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Liên Hệ – Đình Thìn</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <script src="./config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #8B1A1A; --red-dark: #5C0E0E;
+      --gold: #C9A84C; --gold-lt: #E8D49A; --gold-bg: #FFF8E7;
+      --cream: #FFF8F0; --cream2: #F5ECD8;
+      --brown: #2D1B00; --text: #3D2B10; --muted: #7A6050;
+      --white: #FFFFFF; --border: #E8DDD0;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+    button { cursor: pointer; font-family: inherit; }
+    input, select, textarea { font-family: inherit; }
+
+    /* ── HEADER ── */
+    .header {
+      background: var(--red); padding: 0 60px; height: 68px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 16px rgba(0,0,0,.25); position: sticky; top: 0; z-index: 100;
+    }
+    .header-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo-mark { width: 44px; height: 44px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--red-dark); }
+    .logo-text { display: flex; flex-direction: column; }
+    .logo-name { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 700; color: #fff; line-height: 1; }
+    .logo-sub  { font-size: 10px; letter-spacing: 2px; color: var(--gold-lt); text-transform: uppercase; margin-top: 2px; }
+    .header-nav { display: flex; gap: 28px; align-items: center; }
+    .header-nav a { color: #ffffffcc; font-size: 14px; font-weight: 500; text-decoration: none; transition: color .2s; }
+    .header-nav a:hover, .header-nav a.active { color: var(--gold-lt); }
+    .cart-btn { background: var(--gold); color: var(--red-dark); border: none; border-radius: 24px; padding: 8px 20px; font-size: 14px; font-weight: 700; transition: background .2s; }
+    .cart-btn:hover { background: var(--gold-lt); }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--red-dark) 0%, #7A1212 50%, #8B1A1A 100%);
+      padding: 80px 60px; text-align: center; position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C9A84C' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-eyebrow { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; }
+    .hero-title { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; color: #fff; margin-bottom: 16px; line-height: 1.15; }
+    .hero-title span { color: var(--gold); font-style: italic; }
+    .hero-desc { color: #ffffffaa; font-size: 16px; max-width: 480px; margin: 0 auto; line-height: 1.7; }
+
+    /* ── INFO CARDS ── */
+    .info-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1000px; margin: -40px auto 0; padding: 0 60px; position: relative; z-index: 10; }
+    .info-card {
+      background: #fff; border-radius: 16px; padding: 28px 24px; text-align: center;
+      box-shadow: 0 8px 32px rgba(45,27,0,.12); border-top: 3px solid var(--gold);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .info-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(45,27,0,.16); }
+    .info-card-icon { font-size: 32px; margin-bottom: 14px; }
+    .info-card-title { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; color: var(--red); margin-bottom: 8px; }
+    .info-card-text { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .info-card-text a { color: var(--red); text-decoration: none; font-weight: 600; }
+    .info-card-text a:hover { color: var(--gold); }
+
+    /* ── MAIN CONTENT ── */
+    .main { max-width: 1100px; margin: 0 auto; padding: 80px 60px; display: grid; grid-template-columns: 1fr 1.4fr; gap: 60px; align-items: start; }
+
+    /* ── LEFT PANEL ── */
+    .left-panel { position: sticky; top: 88px; }
+    .section-eyebrow { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; color: var(--red); margin-bottom: 16px; line-height: 1.25; }
+    .section-desc { color: var(--muted); font-size: 14px; line-height: 1.8; margin-bottom: 36px; }
+    .divider { width: 48px; height: 3px; background: linear-gradient(90deg, var(--gold), var(--gold-lt)); border-radius: 2px; margin-bottom: 36px; }
+
+    .contact-list { display: flex; flex-direction: column; gap: 20px; margin-bottom: 36px; }
+    .contact-item { display: flex; align-items: flex-start; gap: 16px; }
+    .contact-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--gold-bg); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .contact-item-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 3px; }
+    .contact-item-value { font-size: 14px; font-weight: 600; color: var(--text); }
+    .contact-item-value a { color: var(--text); text-decoration: none; }
+    .contact-item-value a:hover { color: var(--red); }
+
+    .social-title { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 14px; }
+    .social-links { display: flex; gap: 12px; }
+    .social-link {
+      width: 42px; height: 42px; border-radius: 12px; border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+      text-decoration: none; transition: all .2s; background: #fff;
+    }
+    .social-link:hover { border-color: var(--gold); background: var(--gold-bg); transform: translateY(-2px); }
+
+    /* ── FORM ── */
+    .form-card { background: #fff; border-radius: 20px; padding: 40px; box-shadow: 0 4px 24px rgba(45,27,0,.08); }
+    .form-card-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--red); margin-bottom: 28px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 18px; }
+    .form-label { font-size: 12px; font-weight: 600; color: var(--text); display: block; margin-bottom: 7px; text-transform: uppercase; letter-spacing: .5px; }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; padding: 12px 16px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 14px; outline: none; transition: border .2s;
+      background: #fff; color: var(--text);
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,.1); }
+    .form-textarea { resize: vertical; min-height: 130px; }
+    .submit-btn {
+      width: 100%; padding: 14px; background: var(--red); color: #fff;
+      border: none; border-radius: 12px; font-size: 15px; font-weight: 700;
+      letter-spacing: .3px; transition: all .2s; margin-top: 4px;
+    }
+    .submit-btn:hover:not(:disabled) { background: var(--red-dark); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(139,26,26,.3); }
+    .submit-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* ── SUCCESS / ERROR ── */
+    .form-success { text-align: center; padding: 32px 0; }
+    .form-success-icon { font-size: 52px; margin-bottom: 16px; animation: pop .4s ease; }
+    @keyframes pop { 0%{transform:scale(.5)} 70%{transform:scale(1.1)} 100%{transform:scale(1)} }
+    .form-success-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--red); margin-bottom: 8px; }
+    .form-success-sub { color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .err-msg { background: #FFF3F3; border: 1px solid #FFCDD2; color: #c62828; font-size: 13px; padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; }
+
+    /* ── MAP ── */
+    .map-wrap { margin-top: 64px; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(45,27,0,.1); }
+    .map-wrap iframe { width: 100%; height: 320px; border: 0; display: block; }
+
+    /* ── FOOTER ── */
+    footer { background: var(--brown); color: #ffffffaa; padding: 32px 60px; text-align: center; font-size: 13px; margin-top: 80px; }
+    footer span { color: var(--gold); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .header { padding: 0 20px; }
+      .hero { padding: 60px 24px; }
+      .hero-title { font-size: 34px; }
+      .info-cards { grid-template-columns: 1fr; padding: 0 20px; margin-top: -20px; gap: 14px; }
+      .main { grid-template-columns: 1fr; padding: 48px 20px; gap: 40px; }
+      .left-panel { position: static; }
+      .form-row { grid-template-columns: 1fr; }
+      footer { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState } = React;
+const API_URL = API_BASE;
+
+const SUBJECTS = [
+  "Đặt hàng & Giao hàng",
+  "Tư vấn sản phẩm",
+  "Hộp quà & Dịch vụ doanh nghiệp",
+  "Góp ý & Khiếu nại",
+  "Hợp tác kinh doanh",
+  "Khác",
+];
+
+function App() {
+  const [form, setForm] = useState({ name:"", email:"", phone:"", subject: SUBJECTS[0], message:"" });
+  const [loading, setLoading] = useState(false);
+  const [done,    setDone]    = useState(false);
+  const [err,     setErr]     = useState("");
+
+  const set = (k, v) => setForm(f => ({...f, [k]: v}));
+
+  const submit = async () => {
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      setErr("Vui lòng điền họ tên, email và nội dung tin nhắn."); return;
+    }
+    if (!/\S+@\S+\.\S+/.test(form.email)) {
+      setErr("Email không hợp lệ."); return;
+    }
+    setErr(""); setLoading(true);
+    try {
+      const r = await fetch(`${API_URL}/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!r.ok) throw new Error();
+      setDone(true);
+    } catch {
+      setErr("Gửi thất bại, vui lòng thử lại sau.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      {/* Header */}
+      <header className="header">
+        <a href="index.html" className="header-logo">
+          <div className="logo-mark">Đ</div>
+          <div className="logo-text">
+            <span className="logo-name">Đình Thìn</span>
+            <span className="logo-sub">Since 1957</span>
+          </div>
+        </a>
+        <nav className="header-nav">
+          <a href="index.html">Trang chủ</a>
+          <a href="index.html#products-sec">Sản phẩm</a>
+          <a href="index.html#lookup-sec">Tra cứu đơn</a>
+          <a href="contact.html" className="active">Liên hệ</a>
+          <button className="cart-btn" onClick={() => window.location.href="cart.html"}>🛒 Giỏ hàng</button>
+        </nav>
+      </header>
+
+      {/* Hero */}
+      <section className="hero">
+        <p className="hero-eyebrow">Liên hệ với chúng tôi</p>
+        <h1 className="hero-title">Chúng tôi luôn<br /><span>lắng nghe bạn</span></h1>
+        <p className="hero-desc">Dù là đặt hàng, tư vấn quà tặng hay góp ý sản phẩm — đội ngũ Đình Thìn luôn sẵn sàng hỗ trợ bạn.</p>
+      </section>
+
+      {/* Info Cards */}
+      <div className="info-cards">
+        <div className="info-card">
+          <div className="info-card-icon">🏪</div>
+          <p className="info-card-title">Cửa hàng</p>
+          <p className="info-card-text">
+            Số 57, ngõ 42 Xuân Đỉnh<br />Tây Hồ, Hà Nội<br />
+            <a href="https://maps.google.com" target="_blank">Xem bản đồ →</a>
+          </p>
+        </div>
+        <div className="info-card">
+          <div className="info-card-icon">📞</div>
+          <p className="info-card-title">Điện thoại & Zalo</p>
+          <p className="info-card-text">
+            <a href="tel:0912866238">0912 866 238</a><br />
+            Thứ 2 – Chủ nhật<br />7:00 – 21:00
+          </p>
+        </div>
+        <div className="info-card">
+          <div className="info-card-icon">📦</div>
+          <p className="info-card-title">Đặt hàng sỉ & Quà tặng</p>
+          <p className="info-card-text">
+            Hỗ trợ đặt hàng số lượng lớn,<br />thiết kế hộp quà doanh nghiệp<br />theo yêu cầu.
+          </p>
+        </div>
+      </div>
+
+      {/* Main */}
+      <div className="main">
+        {/* Left */}
+        <div className="left-panel">
+          <p className="section-eyebrow">Thông tin liên hệ</p>
+          <h2 className="section-title">Gặp gỡ<br />Đình Thìn</h2>
+          <div className="divider" />
+          <p className="section-desc">Hơn 60 năm gìn giữ hương vị bánh trung thu cổ truyền Hà Nội. Chúng tôi luôn trân trọng mỗi phản hồi từ khách hàng.</p>
+
+          <div className="contact-list">
+            <div className="contact-item">
+              <div className="contact-icon">📍</div>
+              <div>
+                <p className="contact-item-title">Địa chỉ</p>
+                <p className="contact-item-value">Số 57, ngõ 42 Xuân Đỉnh<br />Tây Hồ, Hà Nội</p>
+              </div>
+            </div>
+            <div className="contact-item">
+              <div className="contact-icon">📞</div>
+              <div>
+                <p className="contact-item-title">Điện thoại</p>
+                <p className="contact-item-value"><a href="tel:0912866238">0912 866 238</a></p>
+              </div>
+            </div>
+            <div className="contact-item">
+              <div className="contact-icon">📧</div>
+              <div>
+                <p className="contact-item-title">Email</p>
+                <p className="contact-item-value"><a href="mailto:dinhthin@gmail.com">dinhthin@gmail.com</a></p>
+              </div>
+            </div>
+            <div className="contact-item">
+              <div className="contact-icon">⏰</div>
+              <div>
+                <p className="contact-item-title">Giờ mở cửa</p>
+                <p className="contact-item-value">7:00 – 21:00<br />Thứ 2 – Chủ nhật</p>
+              </div>
+            </div>
+          </div>
+
+          <p className="social-title">Theo dõi chúng tôi</p>
+          <div className="social-links">
+            <a href="#" className="social-link" title="Facebook">📘</a>
+            <a href="#" className="social-link" title="Instagram">📸</a>
+            <a href="#" className="social-link" title="Zalo">💬</a>
+            <a href="#" className="social-link" title="TikTok">🎵</a>
+          </div>
+
+          {/* Map embed */}
+          <div className="map-wrap" style={{marginTop:36}}>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.3927859695564!2d105.81!3d21.07!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjHCsDA0JzEyLjAiTiAxMDXCsDQ4JzM2LjAiRQ!5e0!3m2!1svi!2svn!4v1234567890"
+              allowFullScreen="" loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Đình Thìn trên bản đồ"
+            />
+          </div>
+        </div>
+
+        {/* Right: Form */}
+        <div className="form-card">
+          {done ? (
+            <div className="form-success">
+              <div className="form-success-icon">✉️</div>
+              <h3 className="form-success-title">Gửi thành công!</h3>
+              <p className="form-success-sub">
+                Cảm ơn bạn đã liên hệ.<br />
+                Đội ngũ Đình Thìn sẽ phản hồi trong vòng <strong>24 giờ</strong>.
+              </p>
+              <button
+                style={{marginTop:24,padding:"10px 28px",background:"var(--red)",color:"#fff",border:"none",borderRadius:28,fontWeight:600,fontSize:14}}
+                onClick={() => { setDone(false); setForm({name:"",email:"",phone:"",subject:SUBJECTS[0],message:""}); }}>
+                Gửi tin khác
+              </button>
+            </div>
+          ) : (
+            <>
+              <h2 className="form-card-title">Gửi tin nhắn cho chúng tôi</h2>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Họ và tên *</label>
+                  <input className="form-input" placeholder="Nguyễn Văn A"
+                    value={form.name} onChange={e => set("name", e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Số điện thoại</label>
+                  <input className="form-input" placeholder="0912 345 678" type="tel"
+                    value={form.phone} onChange={e => set("phone", e.target.value)} />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Email *</label>
+                <input className="form-input" placeholder="email@example.com" type="email"
+                  value={form.email} onChange={e => set("email", e.target.value)} />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Chủ đề</label>
+                <select className="form-select"
+                  value={form.subject} onChange={e => set("subject", e.target.value)}>
+                  {SUBJECTS.map(s => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Nội dung *</label>
+                <textarea className="form-textarea" placeholder="Nhập nội dung tin nhắn của bạn..."
+                  value={form.message} onChange={e => set("message", e.target.value)} />
+              </div>
+
+              {err && <div className="err-msg">⚠️ {err}</div>}
+
+              <button className="submit-btn" onClick={submit} disabled={loading}>
+                {loading ? "⏳ Đang gửi..." : "Gửi tin nhắn →"}
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer>
+        <span>Đình Thìn</span> – Bánh Mứt Kẹo Dân Tộc · Since 1957 ·
+        <a href="index.html" style={{color:"var(--gold-lt)",marginLeft:8}}>← Quay về trang chủ</a>
+      </footer>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
+</script>
+</body>
+</html>
