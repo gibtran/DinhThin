@@ -37,6 +37,35 @@ def _seed_admin():
 
 _seed_admin()
 
+# ── Thêm sản phẩm mặc định nếu chưa có ──
+def _seed_products():
+    from sqlalchemy.orm import Session
+    with Session(engine) as db:
+        if db.query(models.Product).first():
+            return  # đã có sản phẩm, bỏ qua
+        products = [
+            # ── Bánh Nướng Đặc Biệt ──
+            dict(name="Bánh Nướng Nhân Trà Xanh",               category="Bánh Nướng Đặc Biệt",          price=80000, weight="210gr", expiry="7 ngày",  badge="Đặc Biệt", image_path="IMG_2152.JPG"),
+            dict(name="Bánh Nướng Cacao Nhân Trứng Muối",        category="Bánh Nướng Đặc Biệt",          price=85000, weight="210gr", expiry="7 ngày",  badge="Đặc Biệt", image_path="IMG_2153.JPG"),
+            # ── Bánh Nhân Nhuyễn Cổ Truyền ──
+            dict(name="Bánh Nướng-Dẻo Nhân Đậu Xanh",           category="Bánh Nhân Nhuyễn Cổ Truyền",   price=65000, weight="200gr", expiry="7 ngày",  badge=None,       image_path="IMG_2154.JPG"),
+            dict(name="Bánh Nướng-Dẻo Nhân Đậu Xanh Trứng Muối",category="Bánh Nhân Nhuyễn Cổ Truyền",   price=75000, weight="210gr", expiry="7 ngày",  badge="Bán Chạy", image_path="IMG_2155.JPG"),
+            dict(name="Bánh Nướng-Dẻo Nhân Sen Xát",             category="Bánh Nhân Nhuyễn Cổ Truyền",   price=90000, weight="210gr", expiry="7 ngày",  badge="Cao Cấp",  image_path="IMG_2156.JPG"),
+            dict(name="Bánh Dẻo Chay Nhân Cốm Xào",              category="Bánh Nhân Nhuyễn Cổ Truyền",   price=70000, weight="200gr", expiry="5 ngày",  badge=None,       image_path="IMG_2157.JPG"),
+            # ── Bánh Nhân Thập Cẩm Cổ Truyền ──
+            dict(name="Bánh Nhân Thập Cẩm Gà Quay Trứng Muối",  category="Bánh Nhân Thập Cẩm Cổ Truyền", price=95000, weight="230gr", expiry="10 ngày", badge="Cao Cấp",  image_path="IMG_2158.JPG"),
+            dict(name="Bánh Nướng-Dẻo Nhân Thập Cẩm Dẩm Bông",  category="Bánh Nhân Thập Cẩm Cổ Truyền", price=80000, weight="200gr", expiry="10 ngày", badge=None,       image_path="IMG_2159.JPG"),
+            dict(name="Bánh Nhân Thập Cẩm Dẩm Bông Trứng Muối", category="Bánh Nhân Thập Cẩm Cổ Truyền", price=90000, weight="230gr", expiry="10 ngày", badge="Bán Chạy", image_path="IMG_2166.JPG"),
+            dict(name="Bánh Nướng-Dẻo Nhân Thập Cẩm Xá Xíu",    category="Bánh Nhân Thập Cẩm Cổ Truyền", price=85000, weight="230gr", expiry="10 ngày", badge=None,       image_path="IMG_2167.JPG"),
+            dict(name="Bánh Nướng-Dẻo Nhân Thập Cẩm Lạp Xưởng", category="Bánh Nhân Thập Cẩm Cổ Truyền", price=85000, weight="200gr", expiry="10 ngày", badge=None,       image_path="IMG_2168.JPG"),
+        ]
+        for p in products:
+            db.add(models.Product(**p))
+        db.commit()
+        print(f"[init] Đã thêm {len(products)} sản phẩm mặc định")
+
+_seed_products()
+
 # ── Rate Limiter ──
 limiter = Limiter(key_func=get_remote_address)
 
