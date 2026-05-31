@@ -8,7 +8,6 @@ from typing import List, Optional
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
@@ -45,19 +44,19 @@ def _seed_products():
             return  # đã có sản phẩm, bỏ qua
         products = [
             # ── Bánh Nướng Đặc Biệt ──
-            dict(name="Bánh Nướng Nhân Trà Xanh",               category="Bánh Nướng Đặc Biệt",          price=80000, weight="210gr", expiry="7 ngày",  badge="Đặc Biệt", image_path="IMG_2152.JPG"),
-            dict(name="Bánh Nướng Cacao Nhân Trứng Muối",        category="Bánh Nướng Đặc Biệt",          price=85000, weight="210gr", expiry="7 ngày",  badge="Đặc Biệt", image_path="IMG_2153.JPG"),
+            dict(name="Bánh Nướng Nhân Trà Xanh",                category="Bánh Nướng Đặc Biệt",          price=80000, weight="210gr", expiry="7 ngày",  badge="Đặc Biệt", image_path="IMG_2213.JPG",  description="Vỏ bánh trà xanh thơm nhẹ, nhân đậu xanh nhuyễn mịn đặc trưng. Hương vị thanh mát, sang trọng – lựa chọn tuyệt vời cho người yêu thích trà xanh."),
+            dict(name="Bánh Nướng Cacao Nhân Trứng Muối",         category="Bánh Nướng Đặc Biệt",          price=85000, weight="210gr", expiry="7 ngày",  badge="Đặc Biệt", image_path="IMG_6320.JPG",  description="Vỏ cacao đậm đà, nhân trứng muối béo bùi đặc sắc. Sự kết hợp táo bạo giữa vị đắng của cacao và vị mặn ngọt của trứng muối."),
             # ── Bánh Nhân Nhuyễn Cổ Truyền ──
-            dict(name="Bánh Nướng-Dẻo Nhân Đậu Xanh",           category="Bánh Nhân Nhuyễn Cổ Truyền",   price=65000, weight="200gr", expiry="7 ngày",  badge=None,       image_path="IMG_2154.JPG"),
-            dict(name="Bánh Nướng-Dẻo Nhân Đậu Xanh Trứng Muối",category="Bánh Nhân Nhuyễn Cổ Truyền",   price=75000, weight="210gr", expiry="7 ngày",  badge="Bán Chạy", image_path="IMG_2155.JPG"),
-            dict(name="Bánh Nướng-Dẻo Nhân Sen Xát",             category="Bánh Nhân Nhuyễn Cổ Truyền",   price=90000, weight="210gr", expiry="7 ngày",  badge="Cao Cấp",  image_path="IMG_2156.JPG"),
-            dict(name="Bánh Dẻo Chay Nhân Cốm Xào",              category="Bánh Nhân Nhuyễn Cổ Truyền",   price=70000, weight="200gr", expiry="5 ngày",  badge=None,       image_path="IMG_2157.JPG"),
+            dict(name="Bánh Nướng-Dẻo Nhân Đậu Xanh",            category="Bánh Nhân Nhuyễn Cổ Truyền",   price=65000, weight="200gr", expiry="7 ngày",  badge=None,        image_path="IMG_2152.JPG",  description="Nhân đậu xanh nhuyễn mịn, thơm bùi tự nhiên. Vỏ bánh vàng óng, mềm xốp – hương vị truyền thống đúng chất Đình Thìn hơn 60 năm."),
+            dict(name="Bánh Nướng-Dẻo Nhân Đậu Xanh Trứng Muối", category="Bánh Nhân Nhuyễn Cổ Truyền",   price=75000, weight="210gr", expiry="7 ngày",  badge="Bán Chạy",  image_path="IMG_6332.JPG",  description="Nhân đậu xanh nhuyễn hòa quyện cùng trứng muối béo ngậy. Vị cổ truyền quen thuộc, không thể thiếu trong dịp Trung Thu."),
+            dict(name="Bánh Nướng-Dẻo Nhân Sen Xát",              category="Bánh Nhân Nhuyễn Cổ Truyền",   price=90000, weight="210gr", expiry="7 ngày",  badge="Cao Cấp",   image_path="IMG_6340.JPG",  description="Nhân hạt sen xát nhuyễn tinh tế, thơm ngào ngạt. Hương sen thanh khiết mang lại cảm giác thư thái, dành tặng những người thân yêu."),
+            dict(name="Bánh Dẻo Chay Nhân Cốm Xào",               category="Bánh Nhân Nhuyễn Cổ Truyền",   price=70000, weight="200gr", expiry="5 ngày",  badge=None,        image_path="IMG_6348.JPG",  description="Nhân cốm xào thơm dẻo đặc trưng của mùa thu Hà Nội. Bánh chay thanh tịnh, thích hợp cho gia đình ăn chay hoặc làm lễ vật."),
             # ── Bánh Nhân Thập Cẩm Cổ Truyền ──
-            dict(name="Bánh Nhân Thập Cẩm Gà Quay Trứng Muối",  category="Bánh Nhân Thập Cẩm Cổ Truyền", price=95000, weight="230gr", expiry="10 ngày", badge="Cao Cấp",  image_path="IMG_2158.JPG"),
-            dict(name="Bánh Nướng-Dẻo Nhân Thập Cẩm Dẩm Bông",  category="Bánh Nhân Thập Cẩm Cổ Truyền", price=80000, weight="200gr", expiry="10 ngày", badge=None,       image_path="IMG_2159.JPG"),
-            dict(name="Bánh Nhân Thập Cẩm Dẩm Bông Trứng Muối", category="Bánh Nhân Thập Cẩm Cổ Truyền", price=90000, weight="230gr", expiry="10 ngày", badge="Bán Chạy", image_path="IMG_2166.JPG"),
-            dict(name="Bánh Nướng-Dẻo Nhân Thập Cẩm Xá Xíu",    category="Bánh Nhân Thập Cẩm Cổ Truyền", price=85000, weight="230gr", expiry="10 ngày", badge=None,       image_path="IMG_2167.JPG"),
-            dict(name="Bánh Nướng-Dẻo Nhân Thập Cẩm Lạp Xưởng", category="Bánh Nhân Thập Cẩm Cổ Truyền", price=85000, weight="200gr", expiry="10 ngày", badge=None,       image_path="IMG_2168.JPG"),
+            dict(name="Bánh Nhân Thập Cẩm Gà Quay Trứng Muối",   category="Bánh Nhân Thập Cẩm Cổ Truyền", price=95000, weight="230gr", expiry="10 ngày", badge="Cao Cấp",   image_path="IMG_2153.JPG",  description="Nhân thập cẩm gà quay đậm đà kết hợp trứng muối bùi béo. Phong phú hương vị nhất trong dòng thập cẩm – lựa chọn sang trọng."),
+            dict(name="Bánh Nướng-Dẻo Nhân Thập Cẩm Dăm Bông",   category="Bánh Nhân Thập Cẩm Cổ Truyền", price=80000, weight="200gr", expiry="10 ngày", badge=None,        image_path="IMG_6321.JPG",  description="Nhân thập cẩm dăm bông thơm ngon hài hòa. Hương vị quen thuộc, đậm chất truyền thống, dễ thưởng thức."),
+            dict(name="Bánh Nhân Thập Cẩm Dăm Bông Trứng Muối",  category="Bánh Nhân Thập Cẩm Cổ Truyền", price=90000, weight="230gr", expiry="10 ngày", badge="Bán Chạy",  image_path="IMG_2179.PNG",  description="Dăm bông thơm ngon kết hợp trứng muối bùi béo. Hương vị cân bằng, đầy đủ, rất được ưa chuộng mỗi mùa Trung Thu."),
+            dict(name="Bánh Nướng-Dẻo Nhân Thập Cẩm Xá Xíu",     category="Bánh Nhân Thập Cẩm Cổ Truyền", price=90000, weight="230gr", expiry="10 ngày", badge=None,        image_path="IMG_6900.JPG",  description="Nhân xá xíu đặc trưng, đậm đà vị cổ truyền. Hương vị khó quên, gợi nhớ ký ức Trung Thu tuổi thơ."),
+            dict(name="Bánh Nướng-Dẻo Nhân Thập Cẩm Lạp Xưởng",  category="Bánh Nhân Thập Cẩm Cổ Truyền", price=65000, weight="200gr", expiry="10 ngày", badge=None,        image_path="IMG_6901.JPG",  description="Nhân thập cẩm lạp xưởng thơm bùi, đặc sắc theo cách rất riêng. Sự lựa chọn tiết kiệm mà vẫn tròn vị cổ truyền."),
         ]
         for p in products:
             db.add(models.Product(**p))
