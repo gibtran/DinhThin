@@ -1,6 +1,11 @@
 # Environment
 backend/.env
 
+# Claude private files (không commit lên GitHub)
+.claude/CLAUDE.local.md
+.claude/settings.local.json
+.claude/memory.md
+
 # Python
 __pycache__/
 *.pyc
